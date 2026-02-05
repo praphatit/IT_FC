@@ -480,7 +480,7 @@
                 </div>
                 <div class="modal-body">
                     <label class="form-label text-warning">เพิ่มรายชื่อทีม (หนึ่งชื่อต่อบรรทัด)</label>
-                    <textarea id="bulkTeamsInput" class="form-control bg-secondary text-white mb-3" rows="5" placeholder="IT Support&#10;Developer&#10;HR Team&#10;Marketing"></textarea>
+                    <textarea id="bulkTeamsInput" class="form-control bg-secondary text-white mb-3" rows="5" placeholder="&#10;Team 1&#10;Team 2&#10;Team 3"></textarea>
                     <button class="btn btn-primary w-100 mb-3" onclick="importTeams()">บันทึกรายชื่อ</button>
                     
                     <hr class="border-secondary">
@@ -564,7 +564,8 @@
             timerInterval: null
         };
 
-        let teams = JSON.parse(localStorage.getItem('itCupTeams')) || ['IT Support', 'Developers', 'Marketing', 'HR', 'Admin'];
+        let teams = JSON.parse(localStorage.getItem('itCupTeams')) || ['บังบอลสั่งลุย', 'ป่อจายน่าฮัก FC', 'เดินโม่ง FC', 'คิดตี้ ยูไนเต็ด'
+        , 'ฝันร้ายไอที ทีม A', 'ฝันร้ายไอที ทีม B', 'LAST MINUTUE ', 'NO LIMITS 2008'];
         let matchHistory = JSON.parse(localStorage.getItem('itCupHistory')) || [];
 
         document.addEventListener('DOMContentLoaded', () => {
