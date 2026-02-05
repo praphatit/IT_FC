@@ -210,31 +210,36 @@
         }
         .settings-panel.open { right: 0; }
         
-        .color-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            border-bottom: 1px solid #333;
-            padding-bottom: 5px;
-        }
-        input[type="color"] {
-            border: none; width: 40px; height: 30px; background: none; cursor: pointer;
-        }
-
         #coin-container {
-            width: 120px; height: 120px; margin: 0 auto;
-            position: relative; transform-style: preserve-3d;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 3s cubic-bezier(0.25, 1, 0.5, 1); /* เอฟเฟกต์หมุนสมจริง */
         }
-        .coin-side {
-            position: absolute; width: 100%; height: 100%; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: bold; font-size: 1.5rem; border: 4px solid #d4af37;
-            backface-visibility: hidden;
-        }
-        .coin-head { background: #ffd700; color: #5c4002; transform: rotateY(0deg); }
-        .coin-tail { background: #c0c0c0; color: #333; transform: rotateY(180deg); }
 
+        .coin-side {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 5px solid #d4af37; /* ขอบสีทอง */
+            background-color: #fff;
+            backface-visibility: hidden; /* ซ่อนด้านหลังเมื่อหมุน */
+            overflow: hidden; /* ตัดส่วนเกินของรูปให้อยู่ในวงกลม */
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        .coin-img {
+            width: 100%;
+        height: 100%;
+        object-fit: cover; /* บังคับรูปให้เต็มวงกลม */
+        }
+
+        .coin-head {transform: rotateY(0deg);}/* ด้านหัว 0 องศา */
+        .coin-tail {transform: rotateY(180deg);}/* ด้านก้อย 180 องศา */
+     
         .main-logo-container {
             display: flex;
             justify-content: center;
@@ -480,7 +485,7 @@
                 </div>
                 <div class="modal-body">
                     <label class="form-label text-warning">เพิ่มรายชื่อทีม (หนึ่งชื่อต่อบรรทัด)</label>
-                    <textarea id="bulkTeamsInput" class="form-control bg-secondary text-white mb-3" rows="5" placeholder="&#10;Team 1&#10;Team 2&#10;Team 3"></textarea>
+                    <textarea id="bulkTeamsInput" class="form-control bg-secondary text-white mb-3" rows="5" placeholder="&#10;Developer&#10;HR Team&#10;Marketing"></textarea>
                     <button class="btn btn-primary w-100 mb-3" onclick="importTeams()">บันทึกรายชื่อ</button>
                     
                     <hr class="border-secondary">
@@ -536,22 +541,34 @@
         </div>
     </div>
 
-    <div class="modal fade" id="coinModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered modal-sm">
-            <div class="modal-content bg-dark text-white text-center border-secondary">
-                <div class="modal-body pt-4" style="height: 250px;">
-                    <div id="coin-container">
-                        <div class="coin-side coin-head">H</div>
-                        <div class="coin-side coin-tail">T</div>
+<div class="modal fade" id="coinModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-white border-warning">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title text-warning"><i class="bi bi-circle-half"></i> เสี่ยงทายเหรียญ</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center py-5">
+                
+                <div id="coin-container">
+                    <div class="coin-side coin-head">
+                        <img src="H.png" class="coin-img" alt="Head">
                     </div>
-                    <div id="coin-result" class="mt-4 fw-bold text-warning" style="opacity:0;">...</div>
+                    <div class="coin-side coin-tail">
+                         <img src="K.png" class="coin-img" alt="Tail">
+                    </div>
                 </div>
-                <div class="modal-footer border-secondary justify-content-center border-0 pb-4">
-                    <button type="button" class="btn btn-outline-warning rounded-pill px-4" onclick="flipCoin()">โยนเหรียญ</button>
+
+                <div class="mt-5">
+                    <h2 id="coinResult" class="fw-bold mb-3 text-white" style="min-height: 40px;">...</h2>
+                    <button class="btn btn-warning rounded-pill px-5 fw-bold" onclick="flipCoin()">
+                        หมุนเหรียญ!
+                    </button>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -871,22 +888,28 @@
 
         function flipCoin() {
             const coin = document.getElementById('coin-container');
-            const resultText = document.getElementById('coin-result');
-            resultText.style.opacity = 0;
-            const result = Math.floor(Math.random() * 2); 
-            
+            const resultText = document.getElementById('coinResult');
+            resultText.innerText = "กำลังหมุน...";
+            resultText.style.color = "#fff";
+            const isHead = Math.random() < 0.5;
+            const baseRotation = 1800; 
+            const targetRotation = baseRotation + (isHead ? 0 : 180);
             coin.style.transition = "none";
             coin.style.transform = "rotateY(0deg)";
-            
-            setTimeout(() => {
-                coin.style.transition = "transform 3s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
-                const rotateAmount = 1800 + (result * 180); 
-                coin.style.transform = `rotateY(${rotateAmount}deg)`;
-            }, 50);
 
             setTimeout(() => {
-                resultText.innerText = result === 0 ? "HEADS (หัว)" : "TAILS (ก้อย)";
-                resultText.style.opacity = 1;
+                coin.style.transition = "transform 3s cubic-bezier(0.25, 1, 0.5, 1)";
+                coin.style.transform = `rotateY(${targetRotation}deg)`;
+            }, 50);
+        
+            setTimeout(() => {
+                if(isHead) {
+                    resultText.innerText = "ออก: หัว (HEADS)";
+                    resultText.style.color = "#ffd700"; 
+                } else {
+                    resultText.innerText = "ออก: ก้อย (TAILS)";
+                    resultText.style.color = "#c0c0c0"; 
+                }
             }, 3000);
         }
     </script>
